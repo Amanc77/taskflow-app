@@ -27,7 +27,7 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      
 
       <main>
         <section className="relative py-20 px-4 overflow-hidden bg-gradient-to-br from-indigo-100 to-purple-100">
