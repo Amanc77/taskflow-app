@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import axiosInstance from "@/lib/axios";
 import { RootState } from "@/store";
 import { toast, Toaster } from "sonner";
@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, Calendar, Edit3, ImageIcon, AlertCircle } from "lucide-react";
+import { setUser } from "@/store/authSlice";
 
 interface ProfileType {
   _id: string;
@@ -33,6 +34,7 @@ export default function Profile() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { user } = useSelector((s: RootState) => s.auth);
+  const dispatch = useDispatch();
 
   const formatJoinDate = (d?: string | null) =>
     d && !isNaN(Date.parse(d))
@@ -88,6 +90,7 @@ export default function Profile() {
       if (data?.success && data.user) {
         setProfile(data.user);
         setForm({ name: data.user.name ?? "", bio: data.user.bio ?? "" });
+        dispatch(setUser(data.user));
         toast.success("Profile updated");
       } else {
         throw new Error(data?.message || "Update failed");
@@ -268,19 +271,6 @@ export default function Profile() {
                         disabled={saving}
                       >
                         {saving ? "Saving..." : "Save Changes"}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        onClick={() => {
-                          setForm({
-                            name: profile.name ?? "",
-                            bio: profile.bio ?? "",
-                          });
-                          toast("Changes discarded");
-                        }}
-                        className="flex-1 sm:flex-none"
-                      >
-                        Reset
                       </Button>
                     </div>
                   </form>
