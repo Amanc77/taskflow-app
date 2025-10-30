@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Task from "@/models/Task";
 import { verifyToken } from "@/lib/auth";
+import { connectDB } from "../../../../lib/db";
 
 export async function PUT(
   req: NextRequest,
@@ -8,6 +9,8 @@ export async function PUT(
 ) {
   const params = await context.params;
   try {
+    await connectDB();
+
     const token = req.cookies.get("token")?.value;
     if (!token) {
       console.log("No token in PUT request");
@@ -73,6 +76,8 @@ export async function DELETE(
 ) {
   const params = await context.params;
   try {
+    await connectDB();
+
     const token = req.cookies.get("token")?.value;
     if (!token) {
       console.log("No token in DELETE request");

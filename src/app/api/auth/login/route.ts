@@ -2,9 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import User from "@/models/User";
 import { generateToken } from "@/lib/auth";
+import { connectDB } from "../../../../lib/db";
 
 export async function POST(req: NextRequest) {
   try {
+    await connectDB();
+
     const body: { email: string; password: string } = await req.json();
     const { email, password } = body;
 

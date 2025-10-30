@@ -1,6 +1,5 @@
 import "./globals.css";
 import ClientProvider from "./ClientProvider";
-import { connectDB } from "@/lib/db";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
@@ -9,10 +8,6 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-
-if (typeof window === "undefined") {
-  connectDB();
-}
 
 export const metadata: Metadata = {
   title: "TaskFlow - Task Management",
