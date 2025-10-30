@@ -1,36 +1,196 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TaskFlow - Task Management App
 
-## Getting Started
+TaskFlow is a **Full-Stack Next.js Task Management Platform** where users can sign up, log in, manage tasks, edit their profile, and log out securely.  
+It features JWT authentication, MongoDB integration, and a modern responsive UI built with Tailwind CSS and shadcn/ui.
 
-First, run the development server:
+🔗 **Live Demo:** [https://taskflow-app-nu.vercel.app](https://taskflow-app-nu.vercel.app)  
+🎥 **Video Demo:** [https://youtu.be/etYtdwYO5pQ](https://youtu.be/etYtdwYO5pQ)
+
+---
+
+## 🧩 Features
+
+- **User Authentication:** Secure signup, login, and logout using JWT.
+- **Task Management:** Create, update, delete, and mark tasks as completed.
+- **User Profile:** View and update your name and bio.
+- **Database Integration:** MongoDB Atlas used for persistent storage.
+- **Responsive Design:** Built with Tailwind CSS and shadcn/ui.
+- **Error Handling:** Graceful API error handling and toast notifications.
+- **Fully Deployed:** Live on Vercel with serverless API routes.
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend:
+
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- Redux Toolkit
+- Axios
+- Sonner (toast notifications)
+- Lucide React (icons)
+
+### Backend:
+
+- Next.js API Routes
+- Node.js
+- MongoDB (Mongoose)
+- JWT Authentication
+
+### Deployment:
+
+- Frontend & Backend → Vercel
+- Database → MongoDB Atlas
+
+---
+
+## ⚙️ Environment Variables
+
+Create a `.env` file in the project root and add the following:
+
+```bash
+# Database
+MONGODB_URI=your_mongodb_connection_string
+
+# JWT Secret
+JWT_SECRET=your_jwt_secret_key
+
+# App URLs
+NEXT_PUBLIC_API_URL=http://localhost:3000
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1️⃣ Clone the Repository
+
+```bash
+git clone https://github.com/your-username/taskflow-app.git
+cd taskflow-app
+```
+
+### 2️⃣ Install Dependencies
+
+```bash
+npm install
+```
+
+### 3️⃣ Run the App
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit: [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📂 Folder Structure
 
-## Learn More
+```
+TASKFLOW-APP
+├── app
+│   ├── api
+│   │   ├── auth
+│   │   │   ├── login
+│   │   │   ├── register
+│   │   │   └── me
+│   │   ├── tasks
+│   │   │   ├── create
+│   │   │   ├── update
+│   │   │   └── delete
+│   ├── profile
+│   ├── tasks
+│   ├── layout.tsx
+│   └── page.tsx
+├── components
+├── lib
+│   ├── db.ts
+│   ├── auth.ts
+│   └── axios.ts
+├── models
+│   ├── User.ts
+│   └── Task.ts
+├── store
+│   ├── authSlice.ts
+│   ├── taskSlice.ts
+│   └── index.ts
+├── public
+├── styles
+│   └── globals.css
+├── postman_collection.json
+├── Scaling_Note_by_Aman.md
+└── TaskFlow_Scaling_and_Production_Note_by_Aman.md
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🧠 Approach & Decisions
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Used **Next.js App Router** with API routes for serverless backend.
+- Connected MongoDB using a reusable connection function.
+- JWT tokens stored in cookies for secure authentication.
+- Profile and task data fetched using protected API routes.
+- Optimized UX with toast notifications and responsive UI.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📄 Postman Collection / API Docs
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+A complete Postman collection is included at:
+
+- [`postman_collection.json`](./postman_collection.json)
+
+It contains endpoints for authentication (signup/login/logout), fetching user profile, and task CRUD operations with JWT authorization headers.
+
+---
+
+## 🏗️ Scaling Notes
+
+A detailed explanation of how I would scale the frontend-backend integration for production is included in the following files:
+
+- [`TaskFlow_Scaling_and_Production_Note.md`](./TaskFlow_Scaling_and_Production_Note.md)
+
+These documents describe how I would:
+
+- Separate the backend into a standalone service
+- Implement secure environment management
+- Add connection pooling and indexes in MongoDB
+- Use HTTP-only cookies for JWT storage
+- Optimize the frontend with ISR and lazy loading
+- Set up CI/CD pipelines for automated deployment
+
+---
+
+## 📸 Screenshots
+
+### Login Page
+
+<img width="3060" height="1550" alt="Login Screenshot" src="https://github.com/user-attachments/assets/0474735e-6621-4d46-93c3-b3cda7f13244" />
+
+### Dashboard Page
+
+<img width="3060" height="1550" alt="Dashboard Screenshot" src="https://github.com/user-attachments/assets/8f49ca4f-ed9e-4507-95e6-a7c36136d08b" />
+
+### Profile Update Page
+
+<img width="3060" height="1550" alt="Profile Screenshot" src="https://github.com/user-attachments/assets/b7b3e117-8657-48d5-8111-dcaa6f478e11" />
+
+### MongoDB Atlas
+
+<img width="3060" height="1550" alt="MongoDB Screenshot" src="https://github.com/user-attachments/assets/e7174abc-b595-48dc-bfee-eed0de14f876" />
+<img width="3060" height="1550" alt="MongoDB Collections" src="https://github.com/user-attachments/assets/6ec6d56c-fed6-4842-80d8-4b9f477a7bbc" />
+
+---
+
+## 💡 Future Improvements
+
+- Implement dark mode.
+- Add drag-and-drop task reordering.
+- Enable profile picture upload.
+
+---
