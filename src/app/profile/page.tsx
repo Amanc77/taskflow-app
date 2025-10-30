@@ -190,15 +190,6 @@ export default function Profile() {
                   </div>
 
                   <div className="text-center sm:text-left space-y-4">
-                    <div>
-                      <h3 className="text-slate-800 font-semibold text-lg sm:text-xl">
-                        {profile.name}
-                      </h3>
-                      <p className="text-sm text-slate-500 mt-1">
-                        {profile.email}
-                      </p>
-                    </div>
-
                     <div className="flex items-center justify-center sm:justify-start gap-2 text-slate-600">
                       <Mail className="h-4 w-4 text-blue-500" />
                       <span className="text-sm">{profile.email}</span>
