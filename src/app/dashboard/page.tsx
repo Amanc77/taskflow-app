@@ -40,6 +40,8 @@ import {
 import { toast, Toaster } from "sonner";
 import api from "@/lib/axios";
 import { Task } from "@/types/task";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
 
 const Dashboard = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -49,6 +51,9 @@ const Dashboard = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useSelector((state: RootState) => state.auth);
+  const [error, setError] = useState<string | null>(null);
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -59,6 +64,11 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchTasks();
+    if (!user) {
+      setError("You must be logged in to view Dashboard.");
+      setIsLoading(false);
+      return;
+    }
   }, []);
 
   useEffect(() => {
@@ -76,7 +86,6 @@ const Dashboard = () => {
 
   const filterTasks = () => {
     let filtered = tasks;
-
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -85,32 +94,26 @@ const Dashboard = () => {
           (t.description?.toLowerCase().includes(q) ?? false)
       );
     }
-
     if (filterStatus !== "all") {
       filtered = filtered.filter((t) => t.status === filterStatus);
     }
-
     setFilteredTasks(filtered);
   };
 
-  // FIXED: handleSubmit – Create & Update
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
     if (!formData.title.trim()) {
       toast.error("Title is required");
       setIsLoading(false);
       return;
     }
-
     const payload = {
       ...formData,
       due_date: formData.due_date
         ? new Date(formData.due_date).toISOString()
         : null,
     };
-
     try {
       if (editingTask) {
         await api.put(`/tasks/${editingTask.id}`, payload);
@@ -131,17 +134,13 @@ const Dashboard = () => {
       setIsLoading(false);
       setIsDialogOpen(false);
       resetForm();
-
-      // Always refresh from server
       const { data } = await api.get<Task[]>("/tasks");
       setTasks(data);
     }
   };
 
-  // FIXED: handleDelete
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this task?")) return;
-
     try {
       await api.delete(`/tasks/${id}`);
       toast.success("Task deleted");
@@ -152,7 +151,6 @@ const Dashboard = () => {
         toast.error("Failed to delete task");
       }
     } finally {
-      // Always refresh from server
       const { data } = await api.get<Task[]>("/tasks");
       setTasks(data);
     }
@@ -203,39 +201,71 @@ const Dashboard = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-muted/30">
-      <Toaster position="top-right" />
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+      </div>
+    );
+  }
 
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50">
+        <Card className="max-w-md w-full mx-4 shadow-xl">
+          <CardHeader>
+            <CardTitle className="text-red-600 flex items-center gap-2">
+              <AlertCircle className="h-5 w-5" />
+              Access Denied
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-700">{error || "You must be logged in."}</p>
+            <Button
+              onClick={() => (window.location.href = "/auth")}
+              className="mt-4 w-full"
+            >
+              Go to Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+      <Toaster position="top-right" />
       <div className="container mx-auto px-4 py-8">
-        <header className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Dashboard</h1>
-          <p className="text-muted-foreground">Manage your tasks efficiently</p>
+        <header className="mb-8 text-center">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+            Dashboard
+          </h1>
+          <p className="text-blue-600">Manage your tasks efficiently</p>
         </header>
 
+        {/* Search + Filter + New */}
         <div className="flex flex-col md:flex-row gap-4 mb-6">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-3 h-4 w-4 text-blue-400" />
             <Input
               placeholder="Search tasks..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 bg-white/80 border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-
           <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-full md:w-48">
+            <SelectTrigger className="w-full md:w-48 bg-white/80 border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white/90 rounded-xl">
               <SelectItem value="all">All</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="in_progress">In Progress</SelectItem>
               <SelectItem value="completed">Completed</SelectItem>
             </SelectContent>
           </Select>
-
           <Dialog
             open={isDialogOpen}
             onOpenChange={(o) => {
@@ -244,14 +274,13 @@ const Dashboard = () => {
             }}
           >
             <DialogTrigger asChild>
-              <Button className="gap-2">
+              <Button className="gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
                 <Plus className="h-4 w-4" /> New Task
               </Button>
             </DialogTrigger>
-
-            <DialogContent className="sm:max-w-[520px]">
+            <DialogContent className="sm:max-w-[520px] bg-white/95 rounded-3xl border-0 shadow-2xl">
               <DialogHeader>
-                <DialogTitle>
+                <DialogTitle className="text-blue-600">
                   {editingTask ? "Edit Task" : "Create Task"}
                 </DialogTitle>
                 <DialogDescription>
@@ -260,7 +289,6 @@ const Dashboard = () => {
                     : "Fill in the details"}
                 </DialogDescription>
               </DialogHeader>
-
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="title">Title *</Label>
@@ -271,9 +299,9 @@ const Dashboard = () => {
                       setFormData({ ...formData, title: e.target.value })
                     }
                     required
+                    className="rounded-xl focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="desc">Description</Label>
                   <Textarea
@@ -283,9 +311,9 @@ const Dashboard = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
+                    className="rounded-xl focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="status">Status</Label>
@@ -295,7 +323,7 @@ const Dashboard = () => {
                         setFormData({ ...formData, status: v })
                       }
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="rounded-xl">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -305,7 +333,6 @@ const Dashboard = () => {
                       </SelectContent>
                     </Select>
                   </div>
-
                   <div className="space-y-2">
                     <Label htmlFor="priority">Priority</Label>
                     <Select
@@ -314,7 +341,7 @@ const Dashboard = () => {
                         setFormData({ ...formData, priority: v })
                       }
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="rounded-xl">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -325,7 +352,6 @@ const Dashboard = () => {
                     </Select>
                   </div>
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="due">Due Date</Label>
                   <Input
@@ -335,9 +361,9 @@ const Dashboard = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, due_date: e.target.value })
                     }
+                    className="rounded-xl focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-
                 <div className="flex justify-end gap-2">
                   <Button
                     type="button"
@@ -346,10 +372,15 @@ const Dashboard = () => {
                       setIsDialogOpen(false);
                       resetForm();
                     }}
+                    className="rounded-xl"
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={isLoading}>
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-xl"
+                  >
                     {isLoading ? "Saving…" : editingTask ? "Update" : "Create"}
                   </Button>
                 </div>
@@ -358,55 +389,63 @@ const Dashboard = () => {
           </Dialog>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {/* Tasks Grid */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredTasks.map((task) => (
             <Card
               key={task.id}
-              className="hover:shadow-lg transition-shadow duration-200 cursor-default"
+              className="shadow-2xl border-0 rounded-3xl bg-white/80 hover:shadow-blue-200 transition-all duration-300 overflow-hidden"
             >
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <CardTitle className="flex items-center gap-2 text-lg">
+                    <CardTitle className="flex items-center gap-2 text-lg text-blue-700">
                       {getStatusIcon(task.status)}
                       <span className="truncate">{task.title}</span>
                     </CardTitle>
-                    <CardDescription className="mt-1 line-clamp-2">
+                    <CardDescription className="mt-1 line-clamp-2 text-blue-600">
                       {task.description || "No description"}
                     </CardDescription>
                   </div>
-
                   <div className="flex gap-1">
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => openEditDialog(task)}
-                      className="hover:bg-muted"
+                      className="hover:bg-blue-50 rounded-full"
                     >
-                      <Pencil className="h-4 w-4" />
+                      <Pencil className="h-4 w-4 text-blue-600" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDelete(task.id)}
-                      className="hover:bg-destructive/10"
+                      className="hover:bg-red-50 rounded-full"
                     >
-                      <Trash2 className="h-4 w-4 text-destructive" />
+                      <Trash2 className="h-4 w-4 text-red-600" />
                     </Button>
                   </div>
                 </div>
               </CardHeader>
-
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  <Badge variant={getPriorityBadge(task.priority)}>
+                  <Badge
+                    variant={getPriorityBadge(task.priority)}
+                    className="bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 border-blue-200"
+                  >
                     {task.priority}
                   </Badge>
-                  <Badge variant="outline">
+                  <Badge
+                    variant="outline"
+                    className="border-blue-200 text-blue-600"
+                  >
                     {task.status.replace("_", " ")}
                   </Badge>
                   {task.due_date && (
-                    <Badge variant="outline">
+                    <Badge
+                      variant="outline"
+                      className="border-blue-200 text-blue-600"
+                    >
                       {new Date(task.due_date).toLocaleDateString()}
                     </Badge>
                   )}
@@ -415,10 +454,9 @@ const Dashboard = () => {
             </Card>
           ))}
         </div>
-
         {filteredTasks.length === 0 && (
-          <Card className="p-12 text-center">
-            <p className="text-muted-foreground">
+          <Card className="p-12 text-center bg-white/80 rounded-3xl shadow-2xl border-0">
+            <p className="text-blue-600 font-medium">
               No tasks found. Create your first one!
             </p>
           </Card>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { User } from "@/models/User";
+import User from "@/models/User";
 import { generateToken } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
       success: true,
       message: `Welcome back ${user.name}`,
       user: { _id: user._id, name: user.name, email: user.email },
+      token,
     });
 
     response.cookies.set("token", token, {

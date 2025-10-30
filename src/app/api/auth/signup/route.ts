@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { User } from "@/models/User";
+import User from "@/models/User";
 import { generateToken } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
       success: true,
       message: "Account created successfully",
       user: { _id: newUser._id, name: newUser.name, email: newUser.email },
+      token,
     });
 
     response.cookies.set("token", token, {

@@ -1,4 +1,5 @@
-import mongoose, { Schema } from "mongoose";
+import { model, models, Schema } from "mongoose";
+import { deflate } from "zlib";
 
 const userSchema = new Schema(
   {
@@ -19,4 +20,6 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-export const User = mongoose.model("User", userSchema);
+const User = models.User || model("User", userSchema);
+
+export default User;

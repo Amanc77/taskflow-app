@@ -14,7 +14,7 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const decoded = verifyToken(token) as { id: string };
-    console.log("Decoded user ID in PUT:", decoded.id); // DEBUG: Check this
+    console.log("Decoded user ID in PUT:", decoded.id);
 
     const task = await Task.findById(params.id);
     console.log(
@@ -22,10 +22,10 @@ export async function PUT(
       task?._id,
       "User in task:",
       task?.user.toString()
-    ); // DEBUG
+    );
 
     if (!task || task.user.toString() !== decoded.id) {
-      console.log("PUT 404: Task not owned by user"); // DEBUG
+      console.log("PUT 404: Task not owned by user");
       return NextResponse.json(
         { error: "Task not found or unauthorized" },
         { status: 404 }
@@ -72,7 +72,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const decoded = verifyToken(token) as { id: string };
-    console.log("Decoded user ID in DELETE:", decoded.id); // DEBUG: Check this
+    console.log("Decoded user ID in DELETE:", decoded.id);
 
     const task = await Task.findById(params.id);
     console.log(
@@ -80,10 +80,10 @@ export async function DELETE(
       task?._id,
       "User in task:",
       task?.user.toString()
-    ); // DEBUG
+    );
 
     if (!task || task.user.toString() !== decoded.id) {
-      console.log("DELETE 404: Task not owned by user"); // DEBUG
+      console.log("DELETE 404: Task not owned by user");
       return NextResponse.json(
         { error: "Task not found or unauthorized" },
         { status: 404 }

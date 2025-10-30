@@ -8,92 +8,98 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Database, Lock, Mail, User } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { userLoggedIn } from "@/store/authSlice";
 import axiosInstance from "@/lib/axios";
 import { Toaster, toast } from "sonner";
-import { AxiosError } from "axios";
 
-interface Credentials {
+interface FormData {
   name?: string;
   email: string;
   password: string;
 }
 
-interface ApiResponse {
-  success: boolean;
-  message: string;
-  user?: { id: string; name: string; email: string };
-  token?: string;
-}
-
-export default function Auth() {
+const Auth = () => {
   const router = useRouter();
-
-  const [login, setLogin] = useState<Credentials>({ email: "", password: "" });
-  const [signup, setSignup] = useState<Credentials>({
-    name: "",
+  const dispatch = useDispatch();
+  const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
   });
   const [loginLoading, setLoginLoading] = useState(false);
   const [signupLoading, setSignupLoading] = useState(false);
 
-  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLogin({ ...login, [e.target.name]: e.target.value });
-  };
-
-  const handleSignupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSignup({ ...signup, [e.target.name]: e.target.value });
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const { email, password } = login;
-
-    if (!email.trim() || !password.trim())
-      return toast.error("Fill all fields");
-    if (!/^\S+@\S+\.\S+$/.test(email)) return toast.error("Invalid email");
-
-    setLoginLoading(true);
-    try {
-      const res = await axiosInstance.post<ApiResponse>("/auth/login", {
-        email: email.trim(),
-        password,
-      });
-
-      toast.success("Logged in!");
-      router.push("/");
-    } catch (err) {
-      const error = err as AxiosError<{ message?: string }>;
-      toast.error(error.response?.data?.message || "Login failed");
-    } finally {
-      setLoginLoading(false);
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { name, email, password } = signup;
-
-    if (!name?.trim() || !email.trim() || !password.trim())
-      return toast.error("All fields required");
-    if (!/^\S+@\S+\.\S+$/.test(email)) return toast.error("Invalid email");
-    if (password.length < 6) return toast.error("Password too short");
-
+    if (!formData.name || !formData.email || !formData.password) {
+      toast.error("All fields are required");
+      return;
+    }
     setSignupLoading(true);
     try {
-      const res = await axiosInstance.post<ApiResponse>("/auth/signup", {
-        name: name.trim(),
-        email: email.trim(),
-        password,
+      const response = await axiosInstance.post("/auth/signup", {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        password: formData.password.trim(),
       });
-
-      toast.success("Account created!");
-      router.push("/");
-    } catch (err) {
-      const error = err as AxiosError<{ message?: string }>;
-      toast.error(error.response?.data?.message || "Signup failed");
+      if (response.data.success) {
+        dispatch(
+          userLoggedIn({
+            user: response.data.user,
+            token: response.data.token || "",
+          })
+        );
+        toast.success(response.data.message);
+        router.push("/");
+      } else {
+        toast.error(response.data.message || "Something went wrong");
+      }
+    } catch (error: any) {
+      console.error("Signup error:", error);
+      toast.error(
+        error.response?.data?.message || "Server error. Try again later."
+      );
     } finally {
       setSignupLoading(false);
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.email || !formData.password) {
+      toast.error("All fields are required");
+      return;
+    }
+    setLoginLoading(true);
+    try {
+      const response = await axiosInstance.post("/auth/login", {
+        email: formData.email.trim(),
+        password: formData.password.trim(),
+      });
+      if (response.data.success) {
+        dispatch(
+          userLoggedIn({
+            user: response.data.user,
+            token: response.data.token || "",
+          })
+        );
+        toast.success(response.data.message);
+        router.push("/");
+      } else {
+        toast.error(response.data.message || "Something went wrong");
+      }
+    } catch (error: any) {
+      console.error("Login error:", error);
+      toast.error(
+        error.response?.data?.message || "Server error. Try again later."
+      );
+    } finally {
+      setLoginLoading(false);
     }
   };
 
@@ -107,8 +113,7 @@ export default function Auth() {
           </div>
           <p className="text-gray-600">Manage your tasks with ease</p>
         </div>
-
-        <Card className="shadow-2xl border-0 rounded-3xl">
+        <Card className="shadow-2xl border-0 rounded-3xl bg-white/95">
           <CardContent className="p-8">
             <Tabs defaultValue="login" className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-100 rounded-full p-1">
@@ -125,7 +130,6 @@ export default function Auth() {
                   Sign Up
                 </TabsTrigger>
               </TabsList>
-
               <TabsContent value="login">
                 <form onSubmit={handleLogin} className="space-y-6">
                   <div className="space-y-2">
@@ -138,13 +142,12 @@ export default function Auth() {
                         name="email"
                         placeholder="you@example.com"
                         className="pl-11 h-12 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-blue-500"
-                        value={login.email}
-                        onChange={handleLoginChange}
+                        value={formData.email || ""}
+                        onChange={handleChange}
                         disabled={loginLoading}
                       />
                     </div>
                   </div>
-
                   <div className="space-y-2">
                     <Label htmlFor="login-password">Password</Label>
                     <div className="relative">
@@ -155,13 +158,12 @@ export default function Auth() {
                         name="password"
                         placeholder="••••••••"
                         className="pl-11 h-12 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-blue-500"
-                        value={login.password}
-                        onChange={handleLoginChange}
+                        value={formData.password || ""}
+                        onChange={handleChange}
                         disabled={loginLoading}
                       />
                     </div>
                   </div>
-
                   <Button
                     type="submit"
                     className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl"
@@ -171,7 +173,6 @@ export default function Auth() {
                   </Button>
                 </form>
               </TabsContent>
-
               <TabsContent value="signup">
                 <form onSubmit={handleSignup} className="space-y-6">
                   <div className="space-y-2">
@@ -182,15 +183,14 @@ export default function Auth() {
                         id="signup-name"
                         type="text"
                         name="name"
-                        placeholder="your name"
+                        placeholder="Your Name"
                         className="pl-11 h-12 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-blue-500"
-                        value={signup.name}
-                        onChange={handleSignupChange}
+                        value={formData.name || ""}
+                        onChange={handleChange}
                         disabled={signupLoading}
                       />
                     </div>
                   </div>
-
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
                     <div className="relative">
@@ -199,15 +199,14 @@ export default function Auth() {
                         id="signup-email"
                         type="email"
                         name="email"
-                        placeholder="abc@gmail.com"
+                        placeholder="you@example.com"
                         className="pl-11 h-12 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-blue-500"
-                        value={signup.email}
-                        onChange={handleSignupChange}
+                        value={formData.email || ""}
+                        onChange={handleChange}
                         disabled={signupLoading}
                       />
                     </div>
                   </div>
-
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">Password</Label>
                     <div className="relative">
@@ -218,13 +217,12 @@ export default function Auth() {
                         name="password"
                         placeholder="••••••••"
                         className="pl-11 h-12 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-blue-500"
-                        value={signup.password}
-                        onChange={handleSignupChange}
+                        value={formData.password || ""}
+                        onChange={handleChange}
                         disabled={signupLoading}
                       />
                     </div>
                   </div>
-
                   <Button
                     type="submit"
                     className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl"
@@ -238,8 +236,9 @@ export default function Auth() {
           </CardContent>
         </Card>
       </div>
-
-      <Toaster position="top-right" richColors closeButton />
+      <Toaster position="top-right" />
     </div>
   );
-}
+};
+
+export default Auth;

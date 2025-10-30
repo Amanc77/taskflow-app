@@ -1,66 +1,88 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { LogOut, LayoutDashboard, User } from "lucide-react";
+import { useSelector, useDispatch } from "react-redux";
+import { userLoggedOut } from "@/store/authSlice";
+import axiosInstance from "@/lib/axios";
 
 const Navbar = () => {
+  const dispatch = useDispatch();
+  const router = useRouter();
   const pathname = usePathname();
-  const user = true; 
-  const signOut = () => {
-    console.log("Logged out");
+  const { isAuthenticated } = useSelector((state: any) => state.auth || {});
+
+  const handleLogout = async () => {
+    try {
+      await axiosInstance.post("/auth/logout");
+      dispatch(userLoggedOut());
+      router.push("/");
+    } catch (err) {
+      console.error("Logout failed", err);
+    }
   };
 
   return (
-    <nav className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold text-foreground">
-            TaskFlow
-          </Link>
+    <nav className="bg-white shadow-sm">
+      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+        {/* Logo */}
+        <div className="flex items-center gap-2">
+          <Database className="h-8 w-8 text-blue-500" />
+          <span className="text-xl font-bold text-blue-500">TaskFlow</span>
+        </div>
 
-          <div className="flex items-center gap-4">
-            {user ? (
-              <>
-                <Link href="/dashboard">
-                  <Button
-                    variant={pathname === "/dashboard" ? "default" : "ghost"}
-                    size="sm"
-                    className="gap-2"
-                  >
-                    <LayoutDashboard className="h-4 w-4" />
-                    Dashboard
-                  </Button>
-                </Link>
+        {/* Navigation */}
+        <div className="flex items-center gap-4">
+          <Button
+            asChild
+            variant="ghost"
+            className={`text-gray-600 hover:text-blue-500 font-bold transition-colors duration-200 ${
+              pathname === "/" ? "text-blue-500" : ""
+            }`}
+          >
+            <Link href="/">Home</Link>
+          </Button>
 
-                <Link href="/profile">
-                  <Button
-                    variant={pathname === "/profile" ? "default" : "ghost"}
-                    size="sm"
-                    className="gap-2"
-                  >
-                    <User className="h-4 w-4" />
-                    Profile
-                  </Button>
-                </Link>
+          <Button
+            asChild
+            variant="ghost"
+            className={`text-gray-600 hover:text-blue-500 font-bold transition-colors duration-200 ${
+              pathname === "/dashboard" ? "text-blue-500" : ""
+            }`}
+          >
+            <Link href="/dashboard">Dashboard</Link>
+          </Button>
 
-                <Button
-                  onClick={signOut}
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Logout
-                </Button>
-              </>
-            ) : (
-              <Link href="/auth">
-                <Button variant="default">Get Started</Button>
-              </Link>
-            )}
-          </div>
+          <Button
+            asChild
+            variant="ghost"
+            className={`text-gray-600 hover:text-blue-500 font-bold transition-colors duration-200 ${
+              pathname === "/profile" ? "text-blue-500" : ""
+            }`}
+          >
+            <Link href="/profile">Profile</Link>
+          </Button>
+
+          {isAuthenticated ? (
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="text-gray-700"
+            >
+              Logout
+            </Button>
+          ) : (
+            <Button
+              asChild
+              variant="ghost"
+              className="text-gray-600 hover:text-blue-500 font-bold transition-colors duration-200"
+            >
+              <Link href="/auth">Login</Link>
+            </Button>
+          )}
         </div>
       </div>
     </nav>
