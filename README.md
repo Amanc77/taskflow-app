@@ -3,6 +3,7 @@
 TaskFlow is a **Full-Stack Next.js Task Management Platform** where users can sign up, log in, manage tasks, edit their profile, and log out securely.  
 It features JWT authentication, MongoDB integration, and a modern responsive UI built with Tailwind CSS and shadcn/ui.
 
+<<<<<<< HEAD
 🔗 **Live Demo:** [https://taskflow-app-nu.vercel.app](https://taskflow-app-nu.vercel.app)
 
 🎥 **Video Demo:** [https://youtu.be/etYtdwYO5pQ](https://youtu.be/etYtdwYO5pQ)
@@ -10,6 +11,7 @@ It features JWT authentication, MongoDB integration, and a modern responsive UI 
 ---
 
 ## 🧩 Features
+<<<<<<< HEAD
 - **User Authentication:** Secure signup, login, and logout using JWT.
 - **Task Management:** Create, update, delete, and mark tasks as completed.
 - **User Profile:** View and update your name and bio.
@@ -21,6 +23,7 @@ It features JWT authentication, MongoDB integration, and a modern responsive UI 
 ---
 
 ## 🛠️ Tech Stack
+<<<<<<< HEAD
 ### Frontend:
 - Next.js (App Router)
 - TypeScript
@@ -32,18 +35,21 @@ It features JWT authentication, MongoDB integration, and a modern responsive UI 
 - Lucide React (icons)
 
 ### Backend:
+<<<<<<< HEAD
 - Next.js API Routes
 - Node.js
 - MongoDB (Mongoose)
 - JWT Authentication
 
 ### Deployment:
+<<<<<<< HEAD
 - Frontend & Backend → Vercel  
 - Database → MongoDB Atlas
 
 ---
 
 ## ⚙️ Environment Variables
+<<<<<<< HEAD
 Create a `.env` file in the project root and add the following:
 
 ```bash
@@ -128,6 +134,7 @@ TASKFLOW-APP
 ---
 
 ## 📸 Screenshots
+<<<<<<< HEAD
 - ## Login Page
 - 
   <img width="3060" height="1550" alt="Screenshot from 2025-10-30 19-31-13" src="https://github.com/user-attachments/assets/0474735e-6621-4d46-93c3-b3cda7f13244" />
@@ -145,6 +152,7 @@ TASKFLOW-APP
 ---
 
 ## 💡 Future Improvements
+<<<<<<< HEAD
 - Implement dark mode.
 - Add drag-and-drop task reordering.
 - Enable profile picture upload.
