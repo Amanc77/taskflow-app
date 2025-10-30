@@ -3,7 +3,7 @@
 TaskFlow is a **Full-Stack Next.js Task Management Platform** where users can sign up, log in, manage tasks, edit their profile, and log out securely.  
 It features JWT authentication, MongoDB integration, and a modern responsive UI built with Tailwind CSS and shadcn/ui.
 
-🔗 **Live Demo:** [https://taskflow-app-nu.vercel.app/profile](https://taskflow-app-nu.vercel.app)
+🔗 **Live Demo:** [https://taskflow-app-nu.vercel.app](https://taskflow-app-nu.vercel.app)
 
 🎥 **Video Demo:** [https://youtu.be/etYtdwYO5pQ](https://youtu.be/etYtdwYO5pQ)
 
@@ -128,14 +128,19 @@ TASKFLOW-APP
 ---
 
 ## 📸 Screenshots
-- Login Page
+- ## Login Page
+- 
   <img width="3060" height="1550" alt="Screenshot from 2025-10-30 19-31-13" src="https://github.com/user-attachments/assets/0474735e-6621-4d46-93c3-b3cda7f13244" />
  
-- Dashboard Page
+- ## Dashboard Page
    <img width="3060" height="1550" alt="Screenshot from 2025-10-30 19-30-40" src="https://github.com/user-attachments/assets/8f49ca4f-ed9e-4507-95e6-a7c36136d08b" />
 
-- Profile Update Page  
+- ## Profile Update Page  
   <img width="3060" height="1550" alt="Screenshot from 2025-10-30 19-31-03" src="https://github.com/user-attachments/assets/b7b3e117-8657-48d5-8111-dcaa6f478e11" />
+  
+- ## MongoDB Atlas 
+  <img width="3060" height="1550" alt="Screenshot from 2025-10-30 19-49-13" src="https://github.com/user-attachments/assets/e7174abc-b595-48dc-bfee-eed0de14f876" />
+  <img width="3060" height="1550" alt="image" src="https://github.com/user-attachments/assets/6ec6d56c-fed6-4842-80d8-4b9f477a7bbc" />
 
 ---
 
