@@ -13,8 +13,15 @@ export async function PUT(
       console.log("No token in PUT request");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const decoded = verifyToken(token) as { id: string };
-    console.log("Decoded user ID in PUT:", decoded.id);
+
+    const decoded = verifyToken(token);
+    if (!decoded || !decoded.userId) {
+      console.log("Invalid token in PUT request");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = decoded.userId;
+    console.log("Decoded user ID in PUT:", userId);
 
     const task = await Task.findById(params.id);
     console.log(
@@ -24,7 +31,7 @@ export async function PUT(
       task?.user.toString()
     );
 
-    if (!task || task.user.toString() !== decoded.id) {
+    if (!task || task.user.toString() !== userId) {
       console.log("PUT 404: Task not owned by user");
       return NextResponse.json(
         { error: "Task not found or unauthorized" },
@@ -71,8 +78,15 @@ export async function DELETE(
       console.log("No token in DELETE request");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const decoded = verifyToken(token) as { id: string };
-    console.log("Decoded user ID in DELETE:", decoded.id);
+
+    const decoded = verifyToken(token);
+    if (!decoded || !decoded.userId) {
+      console.log("Invalid token in DELETE request");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = decoded.userId;
+    console.log("Decoded user ID in DELETE:", userId);
 
     const task = await Task.findById(params.id);
     console.log(
@@ -82,7 +96,7 @@ export async function DELETE(
       task?.user.toString()
     );
 
-    if (!task || task.user.toString() !== decoded.id) {
+    if (!task || task.user.toString() !== userId) {
       console.log("DELETE 404: Task not owned by user");
       return NextResponse.json(
         { error: "Task not found or unauthorized" },
